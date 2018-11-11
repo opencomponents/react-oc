@@ -1,0 +1,30 @@
+{
+  "name": "react-opencomponents-wrapper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "bluebird": "^3.5.3",
+    "jest": "^23.6.0",
+    "jest-plugin-console-matchers": "^2.9.0",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "regenerator-runtime": "^0.12.1"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "object-hash": "^1.3.0",
+    "oc-client-browser": "^1.3.4"
+  }
+}
