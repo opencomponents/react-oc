@@ -1,0 +1,13 @@
+15 error Error: Command failed: git rev-list --left-right --count origin/master...master
+15 error fatal: ambiguous argument 'origin/master...master': unknown revision or path not in the working tree.
+15 error Use '--' to separate paths from revisions, like this:
+15 error 'git <command> [<revision>...] -- [<file>...]'
+15 error
+15 error
+15 error     at makeError (/Users/dipunm/projects/opencomponents/react-opencomponents-wrapper/node_modules/execa/index.js:174:9)
+15 error     at Function.module.exports.sync (/Users/dipunm/projects/opencomponents/react-opencomponents-wrapper/node_modules/execa/index.js:338:15)
+15 error     at Object.execSync (/Users/dipunm/projects/opencomponents/react-opencomponents-wrapper/node_modules/@lerna/child-process/index.js:22:16)
+15 error     at countLeftRight (/Users/dipunm/projects/opencomponents/react-opencomponents-wrapper/node_modules/@lerna/version/lib/is-behind-upstream.js:30:31)
+15 error     at isBehindUpstream (/Users/dipunm/projects/opencomponents/react-opencomponents-wrapper/node_modules/@lerna/version/lib/is-behind-upstream.js:14:27)
+15 error     at VersionCommand.initialize (/Users/dipunm/projects/opencomponents/react-opencomponents-wrapper/node_modules/@lerna/version/index.js:109:7)
+15 error     at Promise.resolve.then (/Users/dipunm/projects/opencomponents/react-opencomponents-wrapper/node_modules/@lerna/command/index.js:245:24)

@@ -1,0 +1,27 @@
+<img src="{{staticPath}}img/logo.png" />
+
+<style>
+    .red {
+        background-color: #8B0000;
+        color: white;
+    }
+
+    .yellow {
+        background-color: #FFFF00;
+        color: black;
+    }
+</style>
+
+<div id="{{uniq}}_message">Hello {{name}}</div>
+
+<script>
+    (function() {
+        var id = '{{{uniq}}}_message';
+        var message = document.getElementById(id);
+        var toggle = true;
+        setInterval(function() {
+            toggle = !toggle;
+            message.className = toggle ? 'red' : 'yellow'
+        }, 1000);
+    })();
+</script>

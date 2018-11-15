@@ -2,7 +2,6 @@ import 'jest-plugin-console-matchers/setup';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
-import hasher from 'object-hash';
 
 import { renderAsync } from './__test__/helpers'
 import { OpenComponentsContext } from "./OpenComponentsContext";

@@ -1,2 +1,2 @@
-export ( OpenComponentsContext ) from './OpenComponentsContext';
-export ( OpenComponent ) from './OpenComponent';
+export { OpenComponentsContext } from './OpenComponentsContext';
+export { OpenComponent } from './OpenComponent';

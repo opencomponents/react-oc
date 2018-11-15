@@ -1,0 +1,29 @@
+{
+  "name": "example",
+  "description": "",
+  "version": "1.0.0",
+  "oc": {
+    "files": {
+      "data": "server.js",
+      "static": [
+        "img"
+      ],
+      "template": {
+        "src": "template.hbs",
+        "type": "oc-template-handlebars"
+      }
+    },
+    "parameters": {
+      "name": {
+        "default": "Jane Doe",
+        "description": "Your name",
+        "example": "Jane Doe",
+        "mandatory": false,
+        "type": "string"
+      }
+    }
+  },
+  "devDependencies": {
+    "oc-template-handlebars-compiler": "6.2.4"
+  }
+}

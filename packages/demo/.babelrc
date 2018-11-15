@@ -1,0 +1,15 @@
+{
+    "env": {
+        "client": {
+            "presets": ["@babel/preset-env", "@babel/preset-react"]
+        },
+        "server": {
+            "presets": [
+                ["@babel/preset-env", {
+                    "ignoreBrowserslistConfig": true
+                }], 
+                "@babel/preset-react"
+            ]
+        }
+    },
+}
