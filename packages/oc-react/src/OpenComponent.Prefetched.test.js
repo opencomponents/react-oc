@@ -23,7 +23,7 @@ describe('<OpenComponent />', () => {
     beforeEach(() => {
         baseContext = { 
             getElement: jest.fn(() => {}), 
-            getHtml: jest.fn(() => {}),
+            getHtml: jest.fn(() => 'hello world'),
             saveElement: jest.fn(() => {}),
         };
     });
@@ -57,6 +57,28 @@ describe('<OpenComponent />', () => {
         expect(node.childNodes[0].className).toBe('my-class');
     });
 
+    it('renders an empty div if no html is provided by context.getHtml', async () => {
+        const node = document.createElement('div');
+        baseContext.getHtml.mockImplementation(() => undefined)
+        await renderAsync(
+            <OCContext.Provider value={{...baseContext}}>
+                <OpenComponent.Prefetched prefetchKey='my-component' />
+            </OCContext.Provider>, node);
+
+        expect(node.innerHTML).toBe('<div></div>');
+    });
+
+    it('renders the fallback if no html is provided by context.getHtml and fallback is provided', async () => {
+        const node = document.createElement('div');
+        baseContext.getHtml.mockImplementation(() => undefined)
+        await renderAsync(
+            <OCContext.Provider value={{...baseContext}}>
+                <OpenComponent.Prefetched prefetchKey='my-component' fallback={`<span>Hello world</span>`} />
+            </OCContext.Provider>, node);
+
+        expect(node.innerHTML).toBe('<div><span>Hello world</span></div>');
+    });
+
     it('should render markup from context.getHtml with prefetchKey in container div', async () => {
         const node = document.createElement('div');
         const fakeHtml = `<h1>Hello world</h1>`;
@@ -69,17 +91,37 @@ describe('<OpenComponent />', () => {
         expect(node.innerHTML).toContain(fakeHtml);
     });
 
-    // JSDOM does not support document.createRange()
-    it.skip('should run scripts from markup in container div', async () => {
+    describe('when getHtml returns an unrendered oc-component tag', () => {
+        const fakeHtml = `<oc-component data-rendered="false" name="my-component"></oc-component>`;
+        it('should call oc.renderNestedComponent when oc is defined', async () => {
+            const node = document.createElement('div');
+            const oc = {
+                renderNestedComponent: jest.fn((_, cb) => cb()),
+                $: x => ({isJquery: true, x}),
+            }
+            baseContext.getHtml.mockImplementation(() => fakeHtml)
+            await renderAsync(
+                <OCContext.Provider value={{...baseContext, oc}}>
+                    <OpenComponent.Prefetched prefetchKey='my-component' />
+                </OCContext.Provider>, node);
+
+            expect(oc.renderNestedComponent).toBeCalledWith(expect.objectContaining({
+                isJquery: true,
+                x: expect.objectContaining({ outerHTML: fakeHtml })
+            }), expect.anything());
+        })
+    });
+
+    it('should render markup from context.getHtml with prefetchKey in container div', async () => {
         const node = document.createElement('div');
-        const fakeHtml = `<h1>Hello world</h1><script>window.hello = world</script>`;
+        const fakeHtml = `<h1>Hello world</h1>`;
         baseContext.getHtml.mockImplementation((key) => key === 'my-component' ? fakeHtml : undefined )
         await renderAsync(
             <OCContext.Provider value={{...baseContext}}>
                 <OpenComponent.Prefetched prefetchKey='my-component' />
             </OCContext.Provider>, node);
 
-        expect(window.hello).toBe('world');
+        expect(node.innerHTML).toContain(fakeHtml);
     });
 
     describe('when server side rendering', () => {
@@ -111,7 +153,7 @@ describe('<OpenComponent />', () => {
         expect(node.innerHTML).toBe(existingMarkup);
     });
 
-    describe('when a given a captureAs prop', () => {
+    describe('when given a captureAs prop', () => {
         it('calls saveElements on context with the captureAs value and elements from getHtml', async () => {
             const node = document.createElement('div');
             const html = '<div>hello</div><h1>world</h1>';

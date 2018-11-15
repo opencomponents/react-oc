@@ -2,7 +2,7 @@ import 'jest-plugin-console-matchers/setup';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
-import hasher from 'object-hash';
+import Promise from 'bluebird';
 
 import { renderAsync, hydrateAsync } from './__test__/helpers'
 import { OpenComponentsContext } from "./OpenComponentsContext";
@@ -25,9 +25,9 @@ describe('<OpenComponent />', () => {
         oc,
 
         baseUrl: 'http://localhost/', 
-        getElement: () => {}, 
+        getElements: () => {}, 
         getHtml: () => {}, 
-        saveElement: () => {},
+        saveElements: () => {},
     };
 
     beforeEach(() => {
@@ -149,14 +149,9 @@ describe('<OpenComponent />', () => {
             const node = document.createElement('div');
             const saveElements = jest.fn()
             const getElements = jest.fn();
-            const renderNestedComponent = (_, callback) => callback();
             const fakeResponse = '<oc-component src="http://localhost/my-component"></oc-component>';
-            const oc = {
-                renderNestedComponent,
-                build: () => fakeResponse,
-                $: x => x
-            };
-
+            oc.build.mockImplementation(() => fakeResponse);
+            
             await renderAsync(
                 <OCContext.Provider value={{...baseContext, saveElements, getElements, oc}}>
                     <OpenComponent name='my-component' captureAs='my-component-1' />
@@ -166,6 +161,51 @@ describe('<OpenComponent />', () => {
                 outerHTML: fakeResponse
             })]);
         });
+
+        it('does not allow dangerouslySetInnerHtml remove existing markup', async () => {
+            /**
+             * This test protects a bug fix from regression.
+             * 
+             * Context: React may call the render function at any time, and in some cases, without
+             * using the lifecycle methods (shouldComponentUpdate and componentDidUpdate).
+             * This combined with the dangerouslySetInnerHtml property, if react detects that the
+             * render method returned anything different, it may choose to update the browser DOM.
+             * 
+             * This test triggers the behaviour described and ensures that even though oc will modify 
+             * the originally specified markup, the render method does not cause React to undo this.
+             */
+            const node = document.createElement('div');
+            let elements;
+            const saveElements = jest.fn((key, els) => elements = els);
+            const getElements = jest.fn(() => elements);
+            const fakeResponse = '<oc-component src="http://localhost/my-component"></oc-component>';
+            const modifiedFakeResponse = '<oc-component src="http://localhost/my-component">hello world</oc-component>'
+            oc.build.mockImplementation(() => fakeResponse);
+            oc.renderNestedComponent.mockImplementation((component, cb) => {
+                component.element.innerHTML = 'hello world';
+                cb();
+            });
+            
+            class RenderTwice extends React.Component {
+                render() {
+                    this.state = {};
+                    setTimeout(() => {
+                        this.setState({renderAgain: true});
+                    }, 3);
+                    return (
+                        <OCContext.Provider value={{...baseContext, saveElements, getElements, oc}}>
+                            {this.state.renderAgain}
+                            <OpenComponent name='my-component' captureAs='my-component-1' />
+                        </OCContext.Provider>
+                    );
+                }
+            }
+
+            await renderAsync(<RenderTwice />, node);
+            await Promise.delay(5);
+
+            expect(node.innerHTML).toContain(modifiedFakeResponse);
+        })
 
         describe('when calling context.getElements with the captureAs prop returns a html element', () => {
             it('calls getElements with the captureAs key', async () => {
@@ -263,6 +303,25 @@ describe('<OpenComponent />', () => {
             expect(node.innerHTML).not.toBe(existingMarkup);
         });
     
+        it('should call oc.build with the correct parameters after hydrating', async () => {
+            const node = document.createElement('div');
+            node.innerHTML = ReactDOMServer.renderToString(
+                <OCContext.Provider value={{...baseContext, oc: undefined, lang: 'en-GB' }}>
+                    <OpenComponent name='my-component' />
+                </OCContext.Provider>);
+    
+            await hydrateAsync(
+                <OCContext.Provider value={{...baseContext, oc, lang: 'en-GB'}}>
+                    <OpenComponent name='my-component' />
+                </OCContext.Provider>, node);
+            
+            expect(oc.build).toHaveBeenLastCalledWith({
+                baseUrl: baseContext.baseUrl,
+                lang: 'en-GB',
+                name: 'my-component',
+            });
+        });
+
         it('should call oc.renderNestedComponent with a jquery element containing the response of oc.build after hydrating', async () => {
             const node = document.createElement('div');
             node.innerHTML = ReactDOMServer.renderToString(

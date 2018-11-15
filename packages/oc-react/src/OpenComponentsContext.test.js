@@ -177,7 +177,7 @@ describe('<OpenComponentsContext></OpenComponentsContext>', () => {
             elements = [{}]
         });
 
-        it('causes a re-render after saveElement was called', async () => {
+        it('should not cause a re-render after saveElement was called', async () => {
             const node = document.createElement('div');
             
             await renderAsync(
@@ -185,18 +185,29 @@ describe('<OpenComponentsContext></OpenComponentsContext>', () => {
                     <Dummy />
                 </OpenComponentsContext>, node);
 
-            await Promise.delay(5) // give React time to re-render
+            await Promise.delay(5) // give React time to not re-render 
     
-            expect(node.textContent).toContain('rendered 2 times');
+            expect(node.textContent).toContain('rendered 1 times');
         });
 
-        it('gets the saved element when calling getElement', async () => {
+        it('the saved element is available by calling getElement when re-rendering', async () => {
             const node = document.createElement('div');
             
-            await renderAsync(
-                <OpenComponentsContext baseUrl='http://localhost/'>
-                    <Dummy />
-                </OpenComponentsContext>, node);
+            class MyComponent extends React.Component {
+                constructor(props) {
+                    super(props);
+                }
+                render() {
+                    setTimeout(() => this.setState({ blah: true }), 3);
+                    return (
+                        <OpenComponentsContext baseUrl='http://localhost/'>
+                            <Dummy />
+                        </OpenComponentsContext>
+                    );
+                }
+            }
+
+            await renderAsync(<MyComponent />, node);
 
             await Promise.delay(5) // give React time to re-render
     
