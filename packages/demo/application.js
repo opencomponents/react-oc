@@ -26,8 +26,12 @@ module.exports = async function (req, res, next) {
 
     const reactApp = ReactDOMServer.renderToString(App(prefetched));
     
-    const ocClientMarkup = `<script>window.oc=window.oc||{};oc.conf=oc.conf||{};oc.conf.templates=(oc.conf.templates||[]).concat([{"type":"oc-template-es6","version":"1.0.1","externals":[]},{"type":"oc-template-jade","version":"6.0.12","externals":[{"global":"jade","url":"https://unpkg.com/jade-legacy@1.11.1/runtime.js","name":"jade"}]},{"type":"oc-template-handlebars","version":"6.0.13","externals":[{"global":"Handlebars","url":"https://unpkg.com/handlebars@4.0.11/dist/handlebars.runtime.min.js","name":"handlebars"}]}]);</script><script src="http://localhost:3000/oc/oc-client/0.45.0/static/src/oc-client.min.js" type="text/javascript"></script>`
-    
+    const ocClientMarkup = await new Promise((resolve, reject) => {
+        client.renderComponent('oc-client', {}, function(err, html) {
+            resolve(html);
+        });
+    });
+     
     res.send(`<!DOCTYPE html>
 <html>
     <head>
