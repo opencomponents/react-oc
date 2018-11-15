@@ -1,6 +1,6 @@
 {
   "name": "demo",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "demo application",
   "main": "index.js",
   "author": "Dipun Mistry <dipunm@gmail.com>",

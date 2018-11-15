@@ -1,10 +1,10 @@
 {
   "name": "react-oc",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "author": "Dipun Mistry <dipunm@gmail.com>",
   "description": "A React component that allows OpenComponents to operate within a react application.",
   "repository": {
-    "url": "https://github.com/opencomponents/oc-react", 
+    "url": "https://github.com/opencomponents/oc-react",
     "type": "git"
   },
   "keywords": [
