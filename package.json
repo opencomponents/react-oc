@@ -3,10 +3,10 @@
   "scripts": {
     "preinstall": "npx use-yarn",
     "test": "cd packages/oc-react && yarn test",
-    "postinstall": "lerna bootstrap"
+    "bootstrap": "lerna bootstrap"
   },
   "private": true,
-  "workspaces": "packages/*",
+  "workspaces": ["packages/*"],
   "author": "Dipun Mistry <dipunm@gmail.com>",
   "license": "MIT",
   "devDependencies": {
