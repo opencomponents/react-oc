@@ -1,6 +1,6 @@
 {
   "name": "demo",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "demo application",
   "main": "index.js",
   "author": "Dipun Mistry <dipunm@gmail.com>",
@@ -21,7 +21,7 @@
     "oc-client": "^3.2.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-oc": ">=1.0.0-alpha.0"
+    "react-oc": "^1.0.0-alpha.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
