@@ -18,8 +18,7 @@
   "scripts": {
     "test": "jest --watch",
     "build": "babel src --out-dir dist --source-maps",
-    "prepublish": "yarn build",
-    "postinstall": "yarn build"
+    "prepare": "yarn build"
   },
   "files": [
     "/src",
