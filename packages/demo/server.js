@@ -2,7 +2,7 @@ require('@babel/register');
 const path = require('path');
 const oc = require('oc');
 const Local = require('oc/src/cli/domain/local');
-const application = require('./application');
+const request = require('./request');
 
 
 const local = new Local();
@@ -24,7 +24,7 @@ local.package({
         local: true,
         path: path.resolve(__dirname, 'components'),
         routes: [
-            { route: '/app', method: 'get', handler: application },
+            { route: '/app', method: 'get', handler: request },
             { route: '/client/application.packed.js', method: 'get', handler: (req, res) => res.sendFile(path.resolve(__dirname, 'client/application.packed.js')) },
         ]
     });
