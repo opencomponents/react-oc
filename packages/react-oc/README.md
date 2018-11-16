@@ -123,6 +123,7 @@ This react-component expects the following props to be defined in the parent `<O
 This react-component is designed to enable server-side rendering. Given a prefetchedComponents prop was provided to the parent `<OpenComponentsContext />` react-component, this react-component will render the markup. In the case where `oc-client` provides a failover `<oc-component />` tag (see: [disableFailoverRendering](https://github.com/opencomponents/oc-client-node#clientrendercomponentcomponentname--options-callback)), this react-component will call `oc.renderNestedComponent` on the client side to ensure that the oc-component loads correctly.
 
 This react-component expects the following props to be defined in the parent `<OpenComponentsContext />` react-component:
+
 | prop | description |
 |---|---|
 | prefetchedComponents | a hash table object `{key: value, ...}` where key will be matched with `prefetchKey`, and the value is a string containing the markup that was fetched using `oc-client`. |
