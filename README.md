@@ -21,6 +21,10 @@ To publish changes:
 yarn lerna publish
 ```
 
+# Outstanding
+- [TODO](./TODO.md)
+- [Issues](https://github.com/opencomponents/oc-react/issues)
+
 # Packages
 ## react-oc
 [Documentation](packages/react-oc/README.md)
