@@ -104,6 +104,7 @@ This react-component will use `oc.build` to render an `<oc-component />` tag wit
 To mitigate the styling issues of wrapping an oc-component in a div element, there are two passthrough props that will be applied to the container div element: `id` and `className`.
 
 This react-component expects the following props to be defined in the parent `<OpenComponentsContext />` react-component:
+
 | prop | description |
 |---|---|
 | baseUrl | see [oc.build options](https://github.com/opencomponents/oc/wiki/Browser-client#ocbuild-options). |
