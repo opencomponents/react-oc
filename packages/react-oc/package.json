@@ -17,7 +17,8 @@
   "license": "MIT",
   "scripts": {
     "test": "jest --watch",
-    "build": "babel src --out-dir dist --source-maps"
+    "build": "babel src --out-dir dist --source-maps",
+    "prepublish": "yarn build"
   },
   "files": [
     "/src",

@@ -21,7 +21,7 @@
     "oc-client": "^3.2.2",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-oc": "file:../react-oc"
+    "react-oc": "*"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
