@@ -4,7 +4,7 @@ More details to follow soon.
 
 ## Installation
 
-```js
+```bash
 npm install react-oc
 ```
 
@@ -45,7 +45,7 @@ res.send(`<!DOCTYPE html>
 ## Usage
 
 1. Wrap your application with `<OpenComponentsContext />`.
-    ```js
+    ```jsx
     export async function main() {
         // pseudo code: This would typically run only server side and provide a
         // hash table: { header: '<div>my header</div>', footer: '<div>my footer</div>' }
@@ -67,7 +67,7 @@ res.send(`<!DOCTYPE html>
     ```
 
 2. Use `<OpenComponent />` to render a client-side only oc-component.
-    ```js
+    ```jsx
     export const MySubComponent1 = (props) => (
         <React.Fragment>
             <h1>Welcome to my application.</h1>
@@ -78,7 +78,7 @@ res.send(`<!DOCTYPE html>
     When called on the server-side, the react-component will render an empty div. Then when hydrated/rendered on the client side, the react-component will expect `clientOc` to be defined in the parent `<OpenComponentsContext />` react-component.
 
 3. Use `<OpenComponent.Prefetched />` to render markup fetched on the server side.
-    ```js
+    ```jsx
     export const MySubComponent2 = (props) => (
         <React.Fragment>
             <h1>Welcome to my application.</h1>
