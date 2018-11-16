@@ -16,6 +16,11 @@ To start the demo application:
 yarn workspace demo start
 ```
 
+To publish changes:
+```bash
+yarn lerna publish
+```
+
 # Packages
 ## react-oc
 [Documentation](packages/react-oc/README.md)
