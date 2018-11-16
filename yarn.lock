@@ -6675,7 +6675,7 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-oc-client-browser@1.3.4, oc-client-browser@^1.3.4:
+oc-client-browser@1.3.4:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/oc-client-browser/-/oc-client-browser-1.3.4.tgz#d40d1b3757b7d323063426195bc055838b77ab27"
   integrity sha512-kB0CxJroh+7X5domwz/hriKY2bQrYONQDJm68vw8Nb3ZsjEDwRrm2l3dFVp9yZGxPDH1hcR6/rmoOMMHk1BiCQ==
