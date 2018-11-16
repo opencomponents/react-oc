@@ -33,7 +33,7 @@ local.package({
             console.log('Registry not started: ', err);
             process.exit(1);
         } else {
-            console.log('Application started at http://localhost:3000');
+            console.log('Application started at http://localhost:3000/app');
         }
     });
 });
