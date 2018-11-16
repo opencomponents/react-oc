@@ -1,6 +1,6 @@
 {
   "name": "react-oc",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "author": "Dipun Mistry <dipunm@gmail.com>",
   "description": "A React component that allows OpenComponents to operate within a react application.",
   "repository": {
@@ -40,7 +40,6 @@
     "regenerator-runtime": "^0.12.1",
     "use-yarn": "^2.2.0"
   },
-  "dependencies": {},
   "peerDependencies": {
     "react": "^16.6.3",
     "react-dom": "^16.6.3"
