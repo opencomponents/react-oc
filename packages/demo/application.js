@@ -40,7 +40,7 @@ module.exports = async function (req, res, next) {
     </head>
     <body>
         <div id="application">${reactApp}</div>
-        <script src="/application.client.js"></script>
+        <script src="/client/application.packed.js"></script>
     </body>
 </html>
     `);
