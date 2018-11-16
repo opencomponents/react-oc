@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "build": "webpack",
-    "prestart": "yarn build",
+    "build-react-oc": "cd ../react-oc && yarn build",
+    "prestart": "yarn build-react-oc && yarn build",
     "start": "node server"
   },
   "browserslist": {
