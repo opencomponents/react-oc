@@ -9,3 +9,5 @@ Use [oc.$.parseHTML](https://api.jquery.com/jquery.parsehtml/) to `keepScripts`.
 - Refactor common logic into functions.
 
 - publish v1 stable once used in a real production application.
+
+- Decide and test/build behaviour for when props change at runtime.
