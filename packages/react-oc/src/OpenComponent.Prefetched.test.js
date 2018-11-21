@@ -145,11 +145,35 @@ describe('<OpenComponent />', () => {
         const existingMarkup = node.innerHTML;
 
         await new Promise((resolve) => ReactDOM.hydrate(
-            <OCContext.Provider value={{...baseContext, getHtml: () => '' }}>
+            <OCContext.Provider value={{...baseContext, getHtml: () => undefined }}>
                 <OpenComponent.Prefetched prefetchKey='my-component' />
             </OCContext.Provider>, node, resolve));
 
         expect(node.innerHTML).toBe(existingMarkup);
+    });
+
+    it('should warn if getHtml provides a different value than server when hydrating', async () => {
+        const node = document.createElement('div');
+        node.innerHTML = ReactDOMServer.renderToString(<OCContext.Provider value={{
+            ...baseContext, getHtml: () => '<h1>Hello</h1><p>World</p>' }}>
+            <OpenComponent.Prefetched prefetchKey='my-component' />
+        </OCContext.Provider>);
+        const existingMarkup = node.innerHTML;
+        
+        const expectedWarning = /Warning: Prop `[^`]+` did not match./
+        suppress.console('error', expectedWarning);
+
+        await new Promise((resolve) => ReactDOM.hydrate(
+            <OCContext.Provider value={{...baseContext, getHtml: () => '<h1>Goodbye</h1><p>Universe</p>' }}>
+                <OpenComponent.Prefetched prefetchKey='my-component' />
+            </OCContext.Provider>, node, resolve));
+
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringMatching(expectedWarning),
+            'dangerouslySetInnerHTML',
+            expect.anything(),
+            expect.anything(),
+        );
     });
 
     describe('when given a captureAs prop', () => {

@@ -27,8 +27,10 @@ export class Prefetched extends React.Component {
                 this.saveElements = context.saveElements;
                 this.capturedElements = this.props.captureAs && context.getElements(this.props.captureAs);
                 this.html = this.capturedElements ? '' : context.getHtml(prefetchKey);
+                let suppressHydrationWarning = false;
                 if (this.html === undefined) {
                     this.html = this.props.fallback || '';
+                    suppressHydrationWarning = true;
                 }
 
                 const html = dangerousHtml(this.html);
@@ -36,7 +38,7 @@ export class Prefetched extends React.Component {
                 return <div ref={this.ref}
                     id={id} className={className} 
                     dangerouslySetInnerHTML={html}
-                    suppressHydrationWarning={true} />;
+                    suppressHydrationWarning={suppressHydrationWarning} />;
             }
         }</OCContext.Consumer>;
     }
