@@ -2,7 +2,7 @@
   "name": "oc-react",
   "scripts": {
     "preinstall": "npx use-yarn",
-    "test": "cd packages/oc-react && yarn test",
+    "test": "cd packages/react-oc && yarn test",
     "bootstrap": "lerna bootstrap"
   },
   "private": true,
