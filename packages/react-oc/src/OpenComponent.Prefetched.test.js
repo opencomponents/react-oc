@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 
-import { renderAsync } from './__test__/helpers'
+import { renderAsync } from './__test__/react-helpers'
 import { OpenComponentsContext } from "./OpenComponentsContext";
 import { OCContext } from "./OCContext";
 import { OpenComponent } from "./OpenComponent";

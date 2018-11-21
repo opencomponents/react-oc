@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import Promise from 'bluebird';
 
-import { renderAsync, hydrateAsync } from './__test__/helpers'
+import { renderAsync, hydrateAsync } from './__test__/react-helpers'
 import { OpenComponentsContext } from "./OpenComponentsContext";
 import { OCContext } from "./OCContext";
 import { OpenComponent } from "./OpenComponent";

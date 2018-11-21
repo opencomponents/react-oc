@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 
-import { renderAsync } from './__test__/helpers'
+import { renderAsync } from './__test__/react-helpers'
 import { OpenComponentsContext } from "./OpenComponentsContext";
 import { OCContext } from './OCContext';
 
