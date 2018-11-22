@@ -35,6 +35,7 @@
     "bluebird": "^3.5.3",
     "jest": "^23.6.0",
     "jest-plugin-console-matchers": "^2.9.0",
+    "jquery": "^3.3.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "regenerator-runtime": "^0.12.1",

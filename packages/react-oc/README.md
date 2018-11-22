@@ -114,6 +114,8 @@ This react-component expects the following props to be defined in the parent `<O
 **NOTE:** When server-side rendering, you may safely provide undefined for these properties.
 
 # `<OpenComponent.Prefetched />`
+**IMPORTANT:** This component was designed to support both universal and client-only react applications. It is expected that there will be no `prefetchedComponents` if hydrating on the client-side. If you provide prefetchedComponents on the client-side, any script tags provided will execute twice.
+
 | prop | mandatory | description |
 |---|---|---|
 | prefetchKey | yes | the key that represents the prefetched html markup. |
@@ -128,9 +130,7 @@ This react-component expects the following props to be defined in the parent `<O
 |---|---|
 | prefetchedComponents | a hash table object `{key: value, ...}` where key will be matched with `prefetchKey`, and the value is a string containing the markup that was fetched using `oc-client`. |
 
-**NOTE:** When client-side rendering, you may safely provide undefined for prefetchedComponents. The react-component will not modify the markup provided by the server when hydrating.
-
-Currently, this react-component is not compatible with client-side only applications. This is because script tags found in prefetchedComponents will not execute if loaded on the client-side.
+**NOTE:** When hydrating over server-side rendered markup, you should provide undefined for prefetchedComponents. The react-component will not modify the markup provided by the server when hydrating.
 
 # Capture As
 By setting a `captureAs` prop on the `<OpenComponent />` and `<OpenComponent.Prefetched />` components, you enable the ability to remove and restore the oc application from the DOM without losing state or registered event handlers. This can be useful when creating an single page application where components that contain oc components may be removed and re-added as the user interacts with the application.

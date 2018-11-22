@@ -2,6 +2,8 @@ import 'jest-plugin-console-matchers/setup';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
+import jQuery from 'jquery';
+import Promise from 'bluebird';
 
 import { renderAsync } from './__test__/react-helpers'
 import { OpenComponentsContext } from "./OpenComponentsContext";
@@ -9,6 +11,11 @@ import { OCContext } from "./OCContext";
 import { OpenComponent } from "./OpenComponent";
 
 describe('<OpenComponent />', () => {
+    const callCountScript = 'window.callCount = window.callCount || 0; window.callCount++;'
+    beforeEach(() => {
+        delete window.callCount;
+        document.body.innerHTML = '';
+    });
     
     describe('When not mounted within a <ComponentContext />', () => {
         it('throws an error', () => {
@@ -18,12 +25,22 @@ describe('<OpenComponent />', () => {
         });
     });
 
-    let baseContext;
+    let baseContext, baseContextServer;
     beforeEach(() => {
         baseContext = { 
             getElement: jest.fn(() => {}), 
             getHtml: jest.fn(() => 'hello world'),
             saveElement: jest.fn(() => {}),
+            oc: {
+                renderNestedComponent: jest.fn((_, cb) => cb()),
+                $: jQuery,
+            }
+        };
+
+        baseContextServer = {
+            getElement: baseContext.getElement,
+            getHtml: baseContext.getHtml,
+            saveElement: baseContext.saveElement,
         };
     });
 
@@ -90,23 +107,32 @@ describe('<OpenComponent />', () => {
         expect(node.innerHTML).toContain(fakeHtml);
     });
 
+    it('should run any scripts from context.getHtml with prefetchKey in container div', async () => {
+        const node = document.createElement('div');
+        document.body.append(node);
+        const fakeHtml = `<h1>Hello world</h1><script>${callCountScript}</script>`;
+        baseContext.getHtml.mockImplementation((key) => key === 'my-component' ? fakeHtml : undefined )
+        await renderAsync(
+            <OCContext.Provider value={{...baseContext}}>
+                <OpenComponent.Prefetched prefetchKey='my-component' />
+            </OCContext.Provider>, node);
+
+        expect(window.callCount).toBe(1);
+    });
+
     describe('when getHtml returns an unrendered oc-component tag', () => {
         const fakeHtml = `<oc-component data-rendered="false" name="my-component"></oc-component>`;
-        it('should call oc.renderNestedComponent when oc is defined', async () => {
+        it('should call oc.renderNestedComponent', async () => {
             const node = document.createElement('div');
-            const oc = {
-                renderNestedComponent: jest.fn((_, cb) => cb()),
-                $: x => ({isJquery: true, x}),
-            }
             baseContext.getHtml.mockImplementation(() => fakeHtml)
             await renderAsync(
-                <OCContext.Provider value={{...baseContext, oc}}>
+                <OCContext.Provider value={{...baseContext}}>
                     <OpenComponent.Prefetched prefetchKey='my-component' />
                 </OCContext.Provider>, node);
 
-            expect(oc.renderNestedComponent).toBeCalledWith(expect.objectContaining({
-                isJquery: true,
-                x: expect.objectContaining({ outerHTML: fakeHtml })
+            expect(baseContext.oc.renderNestedComponent).toBeCalledWith(expect.objectContaining({
+                jquery: expect.anything(),
+                0: expect.objectContaining({ outerHTML: fakeHtml })
             }), expect.anything());
         })
     });
@@ -126,54 +152,97 @@ describe('<OpenComponent />', () => {
     describe('when server side rendering', () => {
         it('should render markup from context.getHtml with prefetchKey in container div', () => {
             const fakeHtml = `<h1>Hello world</h1>`;
-            baseContext.getHtml.mockImplementation((key) => key === 'my-component' ? fakeHtml : undefined )
+            baseContextServer.getHtml.mockImplementation((key) => key === 'my-component' ? fakeHtml : undefined )
             const render = ReactDOMServer.renderToString(
-                <OCContext.Provider value={{...baseContext}}>
+                <OCContext.Provider value={{...baseContextServer}}>
                     <OpenComponent.Prefetched prefetchKey='my-component' />
                 </OCContext.Provider>);
     
             expect(render).toContain(fakeHtml);
         });
     });
+
+    describe('when hydrating over server side rendered markup', () => {
+        it('should not change markup', async () => {
+            const node = document.createElement('div');
+            node.innerHTML = ReactDOMServer.renderToString(<OCContext.Provider value={{
+                ...baseContextServer, getHtml: () => '<h1>Hello</h1><p>World</p>' }}>
+                <OpenComponent.Prefetched prefetchKey='my-component' />
+            </OCContext.Provider>);
+            const existingMarkup = node.innerHTML;
     
-    it('should not change markup when hydrating over server rendered markup', async () => {
-        const node = document.createElement('div');
-        node.innerHTML = ReactDOMServer.renderToString(<OCContext.Provider value={{
-            ...baseContext, getHtml: () => '<h1>Hello</h1><p>World</p>' }}>
-            <OpenComponent.Prefetched prefetchKey='my-component' />
-        </OCContext.Provider>);
-        const existingMarkup = node.innerHTML;
-
-        await new Promise((resolve) => ReactDOM.hydrate(
-            <OCContext.Provider value={{...baseContext, getHtml: () => undefined }}>
+            await new Promise((resolve) => ReactDOM.hydrate(
+                <OCContext.Provider value={{...baseContext, getHtml: () => undefined }}>
+                    <OpenComponent.Prefetched prefetchKey='my-component' />
+                </OCContext.Provider>, node, resolve));
+    
+            expect(node.innerHTML).toBe(existingMarkup);
+        });
+    
+        it('should warn if getHtml provides a different value than server', async () => {
+            const node = document.createElement('div');
+            node.innerHTML = ReactDOMServer.renderToString(<OCContext.Provider value={{
+                ...baseContextServer, getHtml: () => '<h1>Hello</h1><p>World</p>' }}>
                 <OpenComponent.Prefetched prefetchKey='my-component' />
-            </OCContext.Provider>, node, resolve));
-
-        expect(node.innerHTML).toBe(existingMarkup);
-    });
-
-    it('should warn if getHtml provides a different value than server when hydrating', async () => {
-        const node = document.createElement('div');
-        node.innerHTML = ReactDOMServer.renderToString(<OCContext.Provider value={{
-            ...baseContext, getHtml: () => '<h1>Hello</h1><p>World</p>' }}>
-            <OpenComponent.Prefetched prefetchKey='my-component' />
-        </OCContext.Provider>);
-        const existingMarkup = node.innerHTML;
-        
-        const expectedWarning = /Warning: Prop `[^`]+` did not match./
-        suppress.console('error', expectedWarning);
-
-        await new Promise((resolve) => ReactDOM.hydrate(
-            <OCContext.Provider value={{...baseContext, getHtml: () => '<h1>Goodbye</h1><p>Universe</p>' }}>
+            </OCContext.Provider>);
+            const existingMarkup = node.innerHTML;
+            
+            const expectedWarning = /Warning: Prop `[^`]+` did not match./
+            suppress.console('error', expectedWarning);
+    
+            await new Promise((resolve) => ReactDOM.hydrate(
+                <OCContext.Provider value={{...baseContext, getHtml: () => '<h1>Goodbye</h1><p>Universe</p>' }}>
+                    <OpenComponent.Prefetched prefetchKey='my-component' />
+                </OCContext.Provider>, node, resolve));
+    
+            expect(console.error).toHaveBeenCalledWith(
+                expect.stringMatching(expectedWarning),
+                'dangerouslySetInnerHTML',
+                expect.anything(),
+                expect.anything(),
+            );
+        });
+    
+        it('should not run script tags again', async () => {
+            const node = document.createElement('div');
+            document.body.append(node);
+            node.innerHTML = ReactDOMServer.renderToString(<OCContext.Provider value={{
+                ...baseContextServer, getHtml: () => `<h1>Hello</h1><p>World</p><script>${callCountScript}</script>` }}>
                 <OpenComponent.Prefetched prefetchKey='my-component' />
-            </OCContext.Provider>, node, resolve));
+            </OCContext.Provider>);
 
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringMatching(expectedWarning),
-            'dangerouslySetInnerHTML',
-            expect.anything(),
-            expect.anything(),
-        );
+            // simulate browser called script tag.
+            eval(callCountScript);
+            const existingMarkup = node.innerHTML;
+    
+            await new Promise((resolve) => ReactDOM.hydrate(
+                <OCContext.Provider value={{...baseContext, getHtml: () => undefined }}>
+                    <OpenComponent.Prefetched prefetchKey='my-component' />
+                </OCContext.Provider>, node, resolve));
+    
+            expect(window.callCount).toBe(1);
+        });
+
+        it('should run script tags again if getHtml returns the same markup during hydration', async () => {
+            const node = document.createElement('div');
+            document.body.append(node);
+            const fakeMarkup = `<h1>Hello</h1><p>World</p><script>${callCountScript}</script>`;
+            node.innerHTML = ReactDOMServer.renderToString(<OCContext.Provider value={{
+                ...baseContextServer, getHtml: () => fakeMarkup }}>
+                <OpenComponent.Prefetched prefetchKey='my-component' />
+            </OCContext.Provider>);
+
+            // simulate browser called script tag.
+            eval(callCountScript);
+            const existingMarkup = node.innerHTML;
+    
+            await new Promise((resolve) => ReactDOM.hydrate(
+                <OCContext.Provider value={{...baseContext, getHtml: () => fakeMarkup }}>
+                    <OpenComponent.Prefetched prefetchKey='my-component' />
+                </OCContext.Provider>, node, resolve));
+    
+            expect(window.callCount).toBe(2);
+        });
     });
 
     describe('when given a captureAs prop', () => {

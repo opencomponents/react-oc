@@ -59,6 +59,13 @@ export class Prefetched extends React.Component {
             return;
         }
 
+        const markupWasFromContext = this.html && div.innerHTML === this.html;
+        if (markupWasFromContext) { // if not hydrating... TODO: DETECTION ALGORITHM
+            const keepScripts = true;
+            const elements = this.oc.$.parseHTML(this.html, keepScripts);
+            this.oc.$(div).html(elements)
+        }
+
         if (this.props.captureAs) {
             this.saveElements(this.props.captureAs, [...div.childNodes]);
         }

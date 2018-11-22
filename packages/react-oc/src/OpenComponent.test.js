@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 import Promise from 'bluebird';
+import jQuery from 'jquery';
 
 import { renderAsync, hydrateAsync } from './__test__/react-helpers'
 import { OpenComponentsContext } from "./OpenComponentsContext";
@@ -32,7 +33,7 @@ describe('<OpenComponent />', () => {
 
     beforeEach(() => {
         oc.build = jest.fn().mockImplementation(() => fakeResponse);
-        oc.$ = (element) => ({element, isJQuery: true});
+        oc.$ = jQuery;
         oc.renderNestedComponent = jest.fn((_, cb) => cb());
     });
 
@@ -135,11 +136,10 @@ describe('<OpenComponent />', () => {
                     lang='en-GB' parameters={parameters} />
             </OCContext.Provider>, node);
         
-        expect(oc.renderNestedComponent).toBeCalledWith({
-            isJQuery: true, // proves we used the jquery wrapper function
-            element: expect.objectContaining({
+        expect(oc.renderNestedComponent).toBeCalledWith(expect.objectContaining({
+            0: expect.objectContaining({
                 outerHTML: expect.stringContaining(fakeResponse)
-            })},
+            })}),
             expect.anything() //callback function
         );
     });
@@ -182,7 +182,7 @@ describe('<OpenComponent />', () => {
             const modifiedFakeResponse = '<oc-component src="http://localhost/my-component">hello world</oc-component>'
             oc.build.mockImplementation(() => fakeResponse);
             oc.renderNestedComponent.mockImplementation((component, cb) => {
-                component.element.innerHTML = 'hello world';
+                component[0].innerHTML = 'hello world';
                 cb();
             });
             
@@ -330,15 +330,14 @@ describe('<OpenComponent />', () => {
                 </OCContext.Provider>);
     
             await hydrateAsync(
-                <OCContext.Provider value={{...baseContext, oc}}>
+                <OCContext.Provider value={{...baseContext}}>
                     <OpenComponent name='my-component' />
                 </OCContext.Provider>, node);
             
-            expect(oc.renderNestedComponent).toBeCalledWith({
-                isJQuery: true, // proves we used the jquery wrapper function
-                element: expect.objectContaining({
+            expect(oc.renderNestedComponent).toBeCalledWith(expect.objectContaining({
+                0: expect.objectContaining({
                     outerHTML: expect.stringContaining(fakeResponse)
-                })},
+                })}),
                 expect.anything() //callback function
             );
         });
