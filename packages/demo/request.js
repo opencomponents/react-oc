@@ -28,6 +28,9 @@ module.exports = async function (req, res, next) {
     
     const ocClientMarkup = await new Promise((resolve, reject) => {
         client.renderComponent('oc-client', {}, function(err, html) {
+            if (err) {
+                console.error(err);
+            }
             resolve(html);
         });
     });
